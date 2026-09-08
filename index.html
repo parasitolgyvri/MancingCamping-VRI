@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geng Pancing & Camping VRI</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Background Karikatur / Ilustrasi Memancing dengan Overlay Gelap */
+        .hero-bg {
+            background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.90)), 
+                        url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1600&auto=format&fit=crop') no-repeat center center/cover;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen">
+
+    <!-- Butang Panel Admin (Ketua Program) -->
+    <div class="bg-emerald-950 border-b border-emerald-800 py-2 px-4 text-right text-xs">
+        <button onclick="toggleAdminPanel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded transition">
+            <i class="fa-solid fa-gear mr-1"></i> Mod Ketua Program (Edit Info)
+        </button>
+    </div>
+
+    <!-- Header / Hero Section (Background Karikatur Memancing) -->
+    <header class="hero-bg py-16 px-4 text-center shadow-lg border-b border-gray-800">
+        <div class="max-w-4xl mx-auto">
+            <span class="bg-amber-500 text-gray-950 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                Geng Memancing & Camping Institut Penyelidikan Veterinar Ipoh
+            </span>
+            
+            <!-- Paparan Dinamik: Nama Program -->
+            <h1 id="displayProgramName" class="text-3xl md:text-5xl font-extrabold mt-4 mb-3 tracking-wide text-amber-400 drop-shadow-md">
+                Geng Pancing & Camping VRI
+            </h1>
+            <p class="text-sm md:text-base text-amber-200/90 mb-6 font-semibold italic">“Joran Dilontar, Khemah Didirikan, Ukhwah Dieratkan!”</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs md:text-sm text-gray-200 max-w-2xl mx-auto">
+                <div class="bg-gray-900/80 p-3 rounded-lg border border-teal-600/40">
+                    <i class="fa-solid fa-calendar-days text-amber-400 mr-2"></i> <span id="displayDate">25 - 27 Okt 2026</span>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-lg border border-teal-600/40">
+                    <i class="fa-solid fa-location-dot text-amber-400 mr-2"></i> <span id="displayLocation">Tasik Kenyir, Terengganu</span>
+                </div>
+                <div class="bg-gray-900/80 p-3 rounded-lg border border-teal-600/40">
+                    <i class="fa-solid fa-clock text-amber-400 mr-2"></i> Bertolak: <span id="displayDeparture">3:00 Petang</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modal / Panel Admin (Tersembunyi Secara Default) -->
+    <div id="adminPanel" class="hidden bg-gray-900 border-b border-gray-800 p-6 max-w-3xl mx-auto my-4 rounded-xl shadow-2xl">
+        <h3 class="text-lg font-bold text-amber-400 mb-4"><i class="fa-solid fa-pen-to-square mr-2"></i> Kemaskini Maklumat Program (Ketua Sahaja)</h3>
+        <form id="configForm" onsubmit="saveConfig(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="md:col-span-2">
+                <label class="block text-gray-300 mb-1">Nama Program:</label>
+                <input type="text" id="inputProgramName" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" required>
+            </div>
+            <div>
+                <label class="block text-gray-300 mb-1">Pilih Tarikh:</label>
+                <input type="date" id="inputDate" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" required>
+            </div>
+            <div>
+                <label class="block text-gray-300 mb-1">Pilih Waktu Bertolak:</label>
+                <input type="time" id="inputDeparture" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" required>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-gray-300 mb-1">Tempat / Lokasi:</label>
+                <input type="text" id="inputLocation" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white" required>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-gray-300 mb-1">Tentatif Ringkas (Gunakan baris baru untuk setiap masa):</label>
+                <textarea id="inputTentative" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white text-xs"></textarea>
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-2">
+                <button type="button" onclick="toggleAdminPanel()" class="bg-gray-700 px-4 py-2 rounded text-white">Tutup</button>
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded text-white font-bold">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8 space-y-10">
+
+        <!-- Tentatif Program -->
+        <section class="bg-gray-900/90 rounded-2xl p-6 border border-gray-800 shadow-xl">
+            <h2 class="text-xl font-bold text-amber-400 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-list-check"></i> Tentatif Program
+            </h2>
+            <div id="displayTentative" class="space-y-3 text-sm text-gray-300 border-l-2 border-amber-500 pl-4">
+                <!-- Kandungan Tentatif Dinamik -->
+            </div>
+        </section>
+
+        <!-- Pendaftaran Kehadiran (Semua Orang Boleh Isi) -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Borang Daftar -->
+            <section class="bg-gray-900/90 rounded-2xl p-6 border border-gray-800 shadow-xl flex flex-col justify-between">
+               <div>
+                    <h2 class="text-xl font-bold text-emerald-400 mb-2">Daftar Kehadiran Peserta</h2>
+                    <p class="text-gray-400 text-xs mb-4">Masukkan nama anda untuk direkodkan dalam senarai rasmi.</p>
+               </div>
+                
+                <form id="participantForm" onsubmit="addParticipant(event)" class="space-y-4 text-sm">
+                    <div>
+                        <label class="block text-gray-300 mb-1">Nama Penuh Peserta</label>
+                        <input type="text" id="participantName" required placeholder="Cth: Ahmad bin Abu" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg transition shadow">
+                        Daftar Nama Sekarang <i class="fa-solid fa-user-plus ml-1"></i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Senarai Peserta Yang Telah Berdaftar -->
+            <section class="bg-gray-900/90 rounded-2xl p-6 border border-gray-800 shadow-xl flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-amber-400">Senarai Peserta</h2>
+                    <span id="participantCount" class="bg-amber-500/20 text-amber-400 text-xs px-2.5 py-1 rounded-full font-bold">0 Peserta</span>
+                </div>
+                <div class="flex-1 overflow-y-auto max-h-60 pr-1">
+                    <ul id="participantList" class="space-y-2 text-sm text-gray-300">
+                        <!-- Senarai Dimasukkan Di Sini Secara Automatik -->
+                        <li class="text-gray-500 text-xs italic text-center py-4">Belum ada peserta berdaftar.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-gray-500 text-xs border-t border-gray-900 mt-10">
+        &copy; 2026 Geng Pancing & Camping VRI. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Skrip Pengurusan Data (LocalStorage) -->
+    <script>
+        let defaultData = {
+            programName: "Geng Pancing & Camping VRI",
+            date: "2026-10-25",
+            location: "Tasik Kenyir, Terengganu",
+            departure: "15:00",
+            tentative: [
+                "Jumaat (3:00 PTG) - Berkumpul di tapak & dirikan khemah.",
+                "Sabtu (7:00 PAGI) - Sesi memancing bermula & aktiviti bebas.",
+                "Sabtu (8:00 MLM) - BBQ santai hasil tangkapan & sembang pancing.",
+                "Ahad (11:00 PAGI) - Kemas tapak, bergambar kenangan & bersurai."
+            ],
+            participants: []
+        };
+
+        let appData = JSON.parse(localStorage.getItem('vri_pancing_data_v4')) || defaultData;
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            let [hours, minutes] = timeStr.split(':');
+            let h = parseInt(hours);
+            let ampm = h >= 12 ? 'Petang / Malam' : 'Pagi';
+            if (h > 12) h -= 12;
+            if (h === 0) h = 12;
+            return `${h}:${minutes} ${ampm}`;
+        }
+
+        function formatDate(dateStr) {
+            if(!dateStr) return '';
+            let options = { year: 'numeric', month: 'short', day: 'numeric' };
+            let d = new Date(dateStr);
+            return isNaN(d) ? dateStr : d.toLocaleDateString('ms-MY', options);
+        }
+
+        function renderData() {
+            document.getElementById('displayProgramName').textContent = appData.programName;
+            document.getElementById('displayDate').textContent = formatDate(appData.date);
+            document.getElementById('displayLocation').textContent = appData.location;
+            document.getElementById('displayDeparture').textContent = formatTime(appData.departure);
+
+            let tentDiv = document.getElementById('displayTentative');
+            tentDiv.innerHTML = '';
+            appData.tentative.forEach(item => {
+                let p = document.createElement('p');
+                p.textContent = item;
+                tentDiv.appendChild(p);
+            });
+
+            let listUl = document.getElementById('participantList');
+            listUl.innerHTML = '';
+            if(appData.participants.length === 0) {
+                listUl.innerHTML = '<li class="text-gray-500 text-xs italic text-center py-4">Belum ada peserta berdaftar.</li>';
+            } else {
+                appData.participants.forEach((p, index) => {
+                    let li = document.createElement('li');
+                    li.className = "bg-gray-950 p-2.5 rounded border border-gray-800 flex justify-between items-center text-xs";
+                    li.innerHTML = `<div><span class="font-bold text-amber-400">${index + 1}. ${p.name}</span></div>
+                                    <button onclick="deleteParticipant(${index})" class="text-red-400 hover:text-red-300 px-2 py-1"><i class="fa-solid fa-trash"></i></button>`;
+                    listUl.appendChild(li);
+                });
+            }
+            document.getElementById('participantCount').textContent = `${appData.participants.length} Peserta`;
+        }
+
+        function toggleAdminPanel() {
+            let panel = document.getElementById('adminPanel');
+            panel.classList.toggle('hidden');
+            if(!panel.classList.contains('hidden')) {
+                document.getElementById('inputProgramName').value = appData.programName;
+                document.getElementById('inputDate').value = appData.date;
+                document.getElementById('inputLocation').value = appData.location;
+                document.getElementById('inputDeparture').value = appData.departure;
+                document.getElementById('inputTentative').value = appData.tentative.join('\n');
+            }
+        }
+
+        function saveConfig(event) {
+            event.preventDefault();
+            appData.programName = document.getElementById('inputProgramName').value;
+            appData.date = document.getElementById('inputDate').value;
+            appData.location = document.getElementById('inputLocation').value;
+            appData.departure = document.getElementById('inputDeparture').value;
+            
+            let rawTentative = document.getElementById('inputTentative').value;
+            appData.tentative = rawTentative.split('\n').filter(line => line.trim() !== '');
+
+            localStorage.setItem('vri_pancing_data_v4', JSON.stringify(appData));
+            renderData();
+            toggleAdminPanel();
+            alert('Maklumat program berjaya dikemaskini!');
+        }
+
+        function addParticipant(event) {
+            event.preventDefault();
+            let name = document.getElementById('participantName').value;
+
+            appData.participants.push({ name });
+            localStorage.setItem('vri_pancing_data_v4', JSON.stringify(appData));
+            
+            document.getElementById('participantForm').reset();
+            renderData();
+            alert('Nama anda berjaya didaftarkan!');
+        }
+
+        function deleteParticipant(index) {
+            if(confirm('Adakah anda pasti mahu membuang nama ini dari senarai?')) {
+                appData.participants.splice(index, 1);
+                localStorage.setItem('vri_pancing_data_v4', JSON.stringify(appData));
+                renderData();
+            }
+        }
+
+        renderData();
+    </script>
+</body>
+</html>
